@@ -1,0 +1,38 @@
+trigger:
+- main  # Triggers pipeline on changes to the 'main' branch. Update as needed.
+
+pool:
+  name: MyPools
+  demands:
+    - agent.name -equals MyAgent
+
+steps:
+# Step 1: Checkout the code
+- task: Checkout@1
+  displayName: 'Checkout source code'
+  inputs:
+    clean: true
+
+# Step 2: Set up Node.js (Specify the required Node.js version)
+- task: UseNode@1
+  displayName: 'Set up Node.js'
+  inputs:
+    versionSpec: '16.x'  # Use the version required by your project
+
+# Step 3: Install project dependencies
+- script: |
+    npm install
+  displayName: 'Install dependencies'
+
+# Step 4: Run the build script
+- script: |
+    npm run build
+  displayName: 'Build the Vite project'
+
+# Step 5: Publish build artifacts
+- task: PublishBuildArtifacts@1
+  displayName: 'Publish Build Artifacts'
+  inputs:
+    pathtoPublish: 'dist'  # The output folder created by Vite
+    artifactName: 'vite-build'
+    publishLocation: 'Container'
