@@ -17,7 +17,7 @@ steps:
 - task: UseNode@1
   displayName: 'Set up Node.js'
   inputs:
-    versionSpec: '16.x'  # Use the version required by your project
+    versionSpec: '20.x'  # Use the version required by your project
 
 # Step 3: Install project dependencies
 - script: |
