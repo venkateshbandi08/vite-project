@@ -1,5 +1,5 @@
 trigger:
-- main  # Triggers pipeline on changes to the 'main' branch. Update as needed.
+- main
 
 pool:
   name: MyPools
@@ -13,11 +13,30 @@ steps:
   inputs:
     clean: true
 
-# Step 2: Set up Node.js (Specify the required Node.js version)
-- task: UseNode@1
-  displayName: 'Set up Node.js'
-  inputs:
-    versionSpec: '20.x'  # Use the version required by your project
+# Step 2: Install Node.js Manually
+- script: |
+    # Define the Node.js version to install
+    NODE_VERSION=20.0.0
+
+    # Download Node.js binary
+    echo "Downloading Node.js version $NODE_VERSION..."
+    curl -o node.tar.xz https://nodejs.org/dist/v$NODE_VERSION/node-v$NODE_VERSION-linux-x64.tar.xz
+
+    # Extract Node.js binary
+    echo "Extracting Node.js..."
+    mkdir -p /usr/local/lib/nodejs
+    tar -xJf node.tar.xz -C /usr/local/lib/nodejs
+
+    # Update PATH to include Node.js
+    export NODEJS_HOME=/usr/local/lib/nodejs/node-v$NODE_VERSION-linux-x64/bin
+    export PATH=$NODEJS_HOME:$PATH
+
+    # Verify Node.js installation
+    echo "Node.js version:"
+    node -v
+    echo "npm version:"
+    npm -v
+  displayName: 'Install Node.js'
 
 # Step 3: Install project dependencies
 - script: |
@@ -33,6 +52,6 @@ steps:
 - task: PublishBuildArtifacts@1
   displayName: 'Publish Build Artifacts'
   inputs:
-    pathtoPublish: 'dist'  # The output folder created by Vite
+    pathtoPublish: 'dist'
     artifactName: 'vite-build'
     publishLocation: 'Container'
