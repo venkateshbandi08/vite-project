@@ -13,45 +13,26 @@ steps:
   inputs:
     clean: true
 
-# # Step 2: Install Node.js Manually
-# - script: |
-#     # Define the Node.js version to install
-#     NODE_VERSION=20.0.0
+# Step 2: Install Node.js using NodeTool
+- task: NodeTool@0
+  inputs:
+    versionSpec: '14.x'  # Specify the required Node.js version
+  displayName: 'Install Node.js'
 
-#     # Download Node.js binary
-#     echo "Downloading Node.js version $NODE_VERSION..."
-#     curl -o node.tar.xz https://nodejs.org/dist/v$NODE_VERSION/node-v$NODE_VERSION-linux-x64.tar.xz
+# Step 3: Install project dependencies
+- script: |
+    npm install
+  displayName: 'Install dependencies'
 
-#     # Extract Node.js binary
-#     echo "Extracting Node.js..."
-#     mkdir -p /usr/local/lib/nodejs
-#     tar -xJf node.tar.xz -C /usr/local/lib/nodejs
+# Step 4: Run the build script
+- script: |
+    npm run build
+  displayName: 'Build the Vite project'
 
-#     # Update PATH to include Node.js
-#     export NODEJS_HOME=/usr/local/lib/nodejs/node-v$NODE_VERSION-linux-x64/bin
-#     export PATH=$NODEJS_HOME:$PATH
-
-#     # Verify Node.js installation
-#     echo "Node.js version:"
-#     node -v
-#     echo "npm version:"
-#     npm -v
-#   displayName: 'Install Node.js'
-
-# # Step 3: Install project dependencies
-# - script: |
-#     npm install
-#   displayName: 'Install dependencies'
-
-# # Step 4: Run the build script
-# - script: |
-#     npm run build
-#   displayName: 'Build the Vite project'
-
-# # Step 5: Publish build artifacts
-# - task: PublishBuildArtifacts@1
-#   displayName: 'Publish Build Artifacts'
-#   inputs:
-#     pathtoPublish: 'dist'
-#     artifactName: 'vite-build'
-#     publishLocation: 'Container'
+# Step 5: Publish build artifacts
+- task: PublishBuildArtifacts@1
+  displayName: 'Publish Build Artifacts'
+  inputs:
+    pathtoPublish: 'dist'  # Output folder created by Vite
+    artifactName: 'vite-build'
+    publishLocation: 'Container'
